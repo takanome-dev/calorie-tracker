@@ -15,18 +15,14 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="stylesheet" href="./style.css" />
     <title>Tracalorie | Meal & Calorie Tracker</title>
   </head>
   <body>
     <nav>
       <div class="nav-wrapper blue">
-        <div class="container">
-          <a href="#" class="brand-logo center">Tracalorie</a>
-          <ul class="right">
-            <li>
-              <a href="#" class="clear-btn btn blue lighten-3">Clear All</a>
-            </li>
-          </ul>
+        <div class="container center-align">
+          <a href="#" class="logo">Calorie Tracker</a>
         </div>
       </div>
     </nav>
@@ -35,7 +31,7 @@
       <!-- Form card -->
       <div class="card">
         <div class="card-content">
-          <span class="card-title">Add Meal / Food Item</span>
+          <span class="card-title title-card">Add Meal / Food Item</span>
           <form class="col">
             <div class="row">
               <div class="input-field col s6">
@@ -50,7 +46,7 @@
                 />
                 <label for="item-calories">Calories</label>
               </div>
-              <button class="add-btn btn blue darken-3">
+              <button class="add-btn btn blue lighten-2">
                 <i class="fa fa-plus"></i> Add Meal
               </button>
               <button class="update-btn btn orange">
@@ -68,22 +64,34 @@
       </div>
 
       <!-- Calorie count -->
-      <h3 class="center-align">
-        Total Calories: <span class="total-calories">0</span>
-      </h3>
+      <div class="subtitle">
+        <h3 class="total">
+          Total Calories: <span class="total-calories">0</span>
+        </h3>
+        <button class="add-btn btn blue lighten-3">Clear All</button>
+      </div>
       <!-- Item List -->
       <ul id="item-list" class="collection">
         <li class="collection-item" id="item-0">
-          <strong>steak Dinner: </strong> <em>1200 Calories</em>
-          <a href="#" class="secondary-content"><i class="edit-item fa fa-pencil"></i></a>
+          <span class="item-name">Steak Dinner : </span>
+          <span class="item-calorie">1200 Calories</span>
+          <a href="#" class="secondary-content"
+            ><i class="edit-item fa fa-pencil"></i
+          ></a>
         </li>
         <li class="collection-item" id="item-0">
-          <strong>Cookie: </strong> <em>500 Calories</em>
-          <a href="#" class="secondary-content"><i class="edit-item fa fa-pencil"></i></a>
+          <span class="item-name">Cookie : </span>
+          <span class="item-calorie">500 Calories</span>
+          <a href="#" class="secondary-content"
+            ><i class="edit-item fa fa-pencil"></i
+          ></a>
         </li>
         <li class="collection-item" id="item-0">
-          <strong>Eggs: </strong> <em>200 Calories</em>
-          <a href="#" class="secondary-content"><i class="edit-item fa fa-pencil"></i></a>
+          <span class="item-name">Eggs : </span>
+          <span class="item-calorie">200 Calories</span>
+          <a href="#" class="secondary-content"
+            ><i class="edit-item fa fa-pencil"></i
+          ></a>
         </li>
       </ul>
     </div>

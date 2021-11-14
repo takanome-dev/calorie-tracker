@@ -1,0 +1,32 @@
+.logo {
+  color: #031b39;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.btn {
+  color: #031b39;
+}
+
+.total {
+  font-size: 36px;
+  font-weight: 500;
+  color: #343d49;
+}
+
+.subtitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-name {
+  color: #031b39;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.item-calorie {
+  color: #354961;
+  font-size: 18px;
+}
