@@ -1,4 +1,57 @@
 // Storage Controller
+const StorageCtrl = (() => {
+  return {
+    getItemFromLocalStorage: () => {
+      let items;
+
+      if (localStorage.getItem("items") === null) {
+        items = [];
+      } else {
+        items = JSON.parse(localStorage.getItem("items"));
+      }
+
+      return items;
+    },
+    setItemToLocalStorage: (item) => {
+      let items;
+
+      if (localStorage.getItem("items") === null) {
+        items = [];
+        items.push(item);
+        localStorage.setItem("items", JSON.stringify(items));
+      } else {
+        items = JSON.parse(localStorage.getItem("items"));
+        items.push(item);
+        localStorage.setItem("items", JSON.stringify(items));
+      }
+
+      return items;
+    },
+    updateItemFromLocalStorage: (updatedItem) => {
+      const items = JSON.parse(localStorage.getItem("items"));
+
+      items.forEach((item, index) => {
+        if (item.id === updatedItem.id) {
+          items.splice(index, 1, updatedItem);
+        }
+      });
+
+      localStorage.setItem("items", JSON.stringify(items));
+    },
+    deleteItemFromLocalStorage: (id) => {
+      const items = JSON.parse(localStorage.getItem("items"));
+
+      items.forEach((item, index) => {
+        if (item.id === id) {
+          items.splice(index, 1);
+        }
+      });
+
+      localStorage.setItem("items", JSON.stringify(items));
+    },
+    clearItemsFromLocalStorage: () => localStorage.removeItem("items"),
+  };
+})();
 
 // Item Controller
 const ItemCtrl = (() => {
@@ -10,22 +63,17 @@ const ItemCtrl = (() => {
 
   // Initial State
   const data = {
-    items: [
-      // { id: 0, name: "Steak Dinner", calories: 1200 },
-      // { id: 1, name: "Eggs", calories: 200 },
-      // { id: 2, name: "Cookie", calories: 500 },
-    ],
+    items: StorageCtrl.getItemFromLocalStorage(),
     currentItem: null,
   };
 
   return {
-    getItems: () => {
-      return data.items;
-    },
+    getItems: () => data.items,
     addItem: (name, calories) => {
       calories = parseInt(calories);
 
       let ID;
+
       if (data.items.length > 0) {
         ID = data.items[data.items.length - 1].id + 1;
       } else {
@@ -34,13 +82,14 @@ const ItemCtrl = (() => {
 
       const newItem = new Item(ID, name, calories);
 
-      // put item to items array
+      // push newItem to items array
       data.items.push(newItem);
 
       return newItem;
     },
     updateItem: (name, calories) => {
       calories = parseInt(calories);
+
       let found = null;
 
       data.items.forEach((item) => {
@@ -74,13 +123,12 @@ const ItemCtrl = (() => {
     },
     getTotalCalories: () => {
       let totalCalories = 0;
+
       data.items.forEach((item) => (totalCalories += item.calories));
 
       return totalCalories;
     },
-    setCurrentItem: function (item) {
-      data.currentItem = item;
-    },
+    setCurrentItem: (item) => (data.currentItem = item),
     getCurrentItem: () => data.currentItem,
     logData: () => data,
   };
@@ -125,7 +173,7 @@ const UICtrl = (() => {
       calories: document.querySelector(UISelectors.itemInputCalories).value,
     }),
     addItemToList: (item) => {
-      // Show list and clear all btn
+      // Show list and clear btn
       document.querySelector(UISelectors.itemList).style.display = "block";
       document.querySelector(UISelectors.clearBtn).style.display = "block";
 
@@ -209,7 +257,7 @@ const UICtrl = (() => {
 })();
 
 // App Controller
-const App = ((ItemCtrl, UICtrl) => {
+const App = ((ItemCtrl, UICtrl, StorageCtrl) => {
   // Get UI Selectors from UI Controller
   const UISelectors = UICtrl.getSelectors();
 
@@ -250,10 +298,10 @@ const App = ((ItemCtrl, UICtrl) => {
     // Clear all button event
     document
       .querySelector(UISelectors.clearBtn)
-      .addEventListener("click", clearAllItems);
+      .addEventListener("click", clearItems);
   };
 
-  // Add Item To List
+  // Add item to ui list
   const addItem = (e) => {
     e.preventDefault();
 
@@ -267,6 +315,9 @@ const App = ((ItemCtrl, UICtrl) => {
       // Add item to UI List
       UICtrl.addItemToList(newItem);
 
+      // Add item to local storage
+      StorageCtrl.setItemToLocalStorage(newItem);
+
       // Get total calories
       const totalCalories = ItemCtrl.getTotalCalories();
 
@@ -278,7 +329,7 @@ const App = ((ItemCtrl, UICtrl) => {
     }
   };
 
-  // Item update submit
+  // edit item from ui list
   const editItem = (e) => {
     e.preventDefault();
 
@@ -298,7 +349,7 @@ const App = ((ItemCtrl, UICtrl) => {
     }
   };
 
-  // Update item
+  // Update item from ui list
   const updateItem = (e) => {
     e.preventDefault();
 
@@ -308,8 +359,11 @@ const App = ((ItemCtrl, UICtrl) => {
     // Update item value from local data
     const updatedItem = ItemCtrl.updateItem(input.name, input.calories);
 
-    // Update UI
+    // Update UI list item
     UICtrl.updateItemFromList(updatedItem);
+
+    // Update local storage
+    StorageCtrl.updateItemFromLocalStorage(updatedItem);
 
     // Get total calories
     const totalCalories = ItemCtrl.getTotalCalories();
@@ -320,8 +374,10 @@ const App = ((ItemCtrl, UICtrl) => {
     UICtrl.clearEditState();
   };
 
-  // Delete item
-  const deleteItem = () => {
+  // Delete item from ui list
+  const deleteItem = (e) => {
+    e.preventDefault();
+
     // Get current item
     const currentItem = ItemCtrl.getCurrentItem();
 
@@ -330,6 +386,9 @@ const App = ((ItemCtrl, UICtrl) => {
 
     // Delete item from UI
     UICtrl.deleteItemFromList(currentItem.id);
+
+    // Delete item from local storage
+    StorageCtrl.deleteItemFromLocalStorage(currentItem.id);
 
     // Get total calories
     const totalCalories = ItemCtrl.getTotalCalories();
@@ -341,10 +400,22 @@ const App = ((ItemCtrl, UICtrl) => {
   };
 
   // Clear all items
-  const clearAllItems = () => {
+  const clearItems = (e) => {
+    e.preventDefault();
+
+    // Clear items from local data
     ItemCtrl.clearItems();
+
+    // clear items from ui list
     UICtrl.clearItemsFromList();
+
+    // Clear items from local storage
+    StorageCtrl.clearItemsFromLocalStorage();
+
+    // Hide list item
     UICtrl.hideList();
+
+    // Clear edit state
     UICtrl.clearEditState();
 
     // Get total calories
@@ -379,7 +450,7 @@ const App = ((ItemCtrl, UICtrl) => {
       UICtrl.showTotalCalories(totalCalories);
     },
   };
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, UICtrl, StorageCtrl);
 
 // Initialize App
 App.init();
